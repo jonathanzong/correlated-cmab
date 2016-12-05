@@ -18,6 +18,15 @@ body {
   background: #F7F7F7;
 }
 
+svg {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+
 .padding-0 {
   padding: 0 !important;
 }
@@ -27,32 +36,49 @@ body {
   width: 100%;
 }
 
+.correlation rect {
+  fill: none;
+  pointer-events: all;
+}
+
+.correlation .node {
+  fill: #000;
+}
+
+.correlation .cursor {
+  fill: none;
+  stroke: brown;
+}
+
+.correlation .link {
+  stroke: #999;
+}
+
 .boxplot {
   height: 50vh;
   width: 100%;
 }
 
-.box {
+.boxplot .box {
   font: 10px sans-serif;
 }
 
-.box line,
-.box rect,
-.box circle {
+.boxplot .box line,
+.boxplot .box rect,
+.boxplot .box circle {
   fill: #fff;
   stroke: #000;
   stroke-width: 1.5px;
 }
 
-.box .center {
+.boxplot .box .center {
   stroke-dasharray: 3,3;
 }
 
-.box .outlier {
+.boxplot .box .outlier {
   fill: none;
   stroke: #ccc;
 }
-
 
 .regret {
   height: 100vh;
