@@ -4,11 +4,16 @@ $(document).ready(function() {
 
   var fill = d3.scale.category20();
 
+  var initializeNodes = [];
+  for (var i = 0; i < LinUCB.n_arms; i++) {
+    initializeNodes.push({index: i});
+  }
+
   var force = d3.layout.force()
       .size([width, height])
-      .nodes([{}]) // initialize with a single node
-      .linkDistance(30)
-      .charge(-60)
+      .nodes(initializeNodes) // initialize
+      .linkDistance(60)
+      .charge(-120)
       .on("tick", tick);
 
   var svg = d3.select(".correlation").append("svg")
@@ -23,11 +28,6 @@ $(document).ready(function() {
       links = force.links(),
       node = svg.selectAll(".node"),
       link = svg.selectAll(".link");
-
-  var cursor = svg.append("circle")
-      .attr("r", 30)
-      .attr("transform", "translate(-100,-100)")
-      .attr("class", "cursor");
 
   var drag_line = svg.append('svg:path')
     .attr('class', 'link dragline hidden')
@@ -46,8 +46,6 @@ $(document).ready(function() {
   }
 
   function mousemove() {
-    cursor.attr("transform", "translate(" + d3.mouse(this) + ")");
-
     if (!mousedown_node) return;
  
     // update drag line
@@ -58,11 +56,6 @@ $(document).ready(function() {
 
   function mousedown() {
     if (mousedown_node || mousedown_link) return;
-
-    var point = d3.mouse(this),
-        node = {x: point[0], y: point[1]},
-        n = nodes.push(node);
-
     restart();
   }
 
@@ -73,7 +66,7 @@ $(document).ready(function() {
         .classed('hidden', true);
 
       // check for drag-to-self
-      if (mouseup_node === mousedown_node) { resetMouseVars(); return; }
+      if (!mouseup_node || mouseup_node === mousedown_node) { resetMouseVars(); return; }
 
       // add link to graph (update if exists)
       // NB: links are strictly source < target; arrows separately specified by booleans
@@ -94,12 +87,13 @@ $(document).ready(function() {
       if(!link) {
         link = {source: source, target: target};
         links.push(link);
+        linksToContextVectors();
       }
    
       // select new link
       selected_link = link;
       selected_node = null;
-      
+
       restart();
     }
    
@@ -116,8 +110,7 @@ $(document).ready(function() {
         .attr("x2", function(d) { return d.target.x; })
         .attr("y2", function(d) { return d.target.y; });
 
-    node.attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
+    node.attr("transform", function(d){return "translate("+d.x+","+d.y+")"});
   }
 
   function restart() {
@@ -128,27 +121,38 @@ $(document).ready(function() {
 
     node = node.data(nodes);
 
-    node.enter().insert("circle", ".cursor")
-        .attr("class", "node")
-        .attr("r", 5)
-        .on('mousedown', function(d) {
-          mousedown_node = d;
+    var g = node.enter().append("svg:g")
+      .attr("class", "node");
+    g.append('circle')
+      .attr("r", 15)
+      .on('mousedown', function(d) {
+        mousedown_node = d;
 
-          if (mousedown_node === selected_node) selected_node = null;
-          else selected_node = mousedown_node;
-          
-          selected_link = null;
+        if (mousedown_node === selected_node) selected_node = null;
+        else selected_node = mousedown_node;
+        
+        selected_link = null;
 
-          drag_line
-            .classed('hidden', false)
-            .attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + mousedown_node.x + ',' + mousedown_node.y);
+        drag_line
+          .classed('hidden', false)
+          .attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + mousedown_node.x + ',' + mousedown_node.y);
 
-          restart();
-        })
-        .on('mouseover', function(d) {
-          if (!mousedown_node) return;
-          mouseup_node = d;
-        });
+        restart();
+      })
+      .on('mouseenter', function(d) {
+        if (!mousedown_node) return;
+        mouseup_node = d;
+      })
+      .on('mouseleave', function(d) {
+        if (mouseup_node === d) {
+          mouseup_node = null;
+        }
+      });
+      g.append('text')
+        .attr("x", 0)
+        .attr("dy", ".35em")
+        .text(function(d) {return d.index;})
+        .attr("text-anchor", "middle");
 
     force.start();
   }
@@ -158,4 +162,14 @@ $(document).ready(function() {
      .on('mouseup', mouseup);
 
   restart();
+
+  function linksToContextVectors() {
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i].source.index;
+      var b = links[i].target.index;
+      LinUCB.arms[a].setContextAt(b, 1);
+      LinUCB.arms[b].setContextAt(a, 1);
+    }
+  }
+
 });

@@ -41,13 +41,14 @@ svg {
   pointer-events: all;
 }
 
-.correlation .node {
-  fill: #000;
+.correlation .node circle {
+  fill: #333;
+  cursor: pointer;
 }
 
-.correlation .cursor {
-  fill: none;
-  stroke: brown;
+.correlation .node text {
+  fill: #f7f7f7;
+  pointer-events: none;
 }
 
 .correlation .link {

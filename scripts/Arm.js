@@ -1,13 +1,18 @@
 var Arm = function (id) {
-  var d_features = LinUCB.n_arms + LinUCB.n_extra_features;
+  var d = LinUCB.d_extra_features; // number of arm-specific features
+  var k = LinUCB.n_arms; // number of shared/common features
   this.id = id;
-  this.A = math.eye(d_features);
-  this.b = math.zeros(d_features, 1);
-  this.context = math.zeros(d_features, 1);
-  this.context.subset(math.index(id, 0), 1); // arm is perfectly correlated with itself
+  this.A = math.eye(d + k);
+  this.b = math.zeros(d + k, 1);
+  this.context = math.zeros(d + k, 1);
+  this.setContextAt(id, 1) // arm is perfectly correlated with itself
   var distribution = LinUCB.reward_mapping(id);
   this.reward_distribution = gaussian(distribution.mean, distribution.variance);
 };
+
+Arm.prototype.setContextAt = function(idx, val) {
+  this.context.subset(math.index(idx, 0), val);
+}
 
 Arm.prototype.theta = function() {
   return math.multiply(math.inv(this.A), this.b);

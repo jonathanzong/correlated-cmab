@@ -1,15 +1,15 @@
 var LinUCB = {
   n_arms: 3, // number of arms
-  n_extra_features: 0, // number of context features (not counting n correlations)
-  alpha: 2.627,
+  d_extra_features: 0, // number of context features (not counting n correlations)
+  alpha: 2.627, // upper bound coefficient
   arms: [],
   a: [], // a[t] = arm chosen at t
   r: [], // r[t] = reward at t
   t: 0,
   reward_mapping: function(arm_id) {
     return {
-      mean: Math.random(),
-      variance: Math.random()
+      mean: 2 * (arm_id / LinUCB.n_arms) - 1,
+      variance: 1
     };
   },
   init: function() {
