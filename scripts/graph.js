@@ -5,7 +5,7 @@ $(document).ready(function() {
   var fill = d3.scale.category20();
 
   var initializeNodes = [];
-  for (var i = 0; i < LinUCB.n_arms; i++) {
+  for (var i = 0; i < LinUCB.k_arms; i++) {
     initializeNodes.push({index: i});
   }
 
@@ -167,8 +167,8 @@ $(document).ready(function() {
     for (var i = 0; i < links.length; i++) {
       var a = links[i].source.index;
       var b = links[i].target.index;
-      LinUCB.arms[a].setContextAt(b, 1);
-      LinUCB.arms[b].setContextAt(a, 1);
+      LinUCB.arms[a].setSharedContextAt(b, 1);
+      LinUCB.arms[b].setSharedContextAt(a, 1);
     }
   }
 

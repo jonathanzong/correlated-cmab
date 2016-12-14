@@ -1,7 +1,6 @@
-LinUCB.init();
-
 //
 $(document).ready(function() {
+  LinUCB.init();
   var margin = {top: 10, right: 50, bottom: 20, left: 50},
       width = 120 - margin.left - margin.right,
       height = $(".boxplot").height() - margin.top - margin.bottom;
@@ -16,7 +15,7 @@ $(document).ready(function() {
 ///////
   chart.domain([min, max]);
   var data = [];
-  for (var i = 0; i < LinUCB.n_arms; i++) {
+  for (var i = 0; i < LinUCB.k_arms; i++) {
     data.push([]);
   }
 
