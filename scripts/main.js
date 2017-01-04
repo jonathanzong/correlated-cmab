@@ -2,7 +2,7 @@
 $(document).ready(function() {
   LinUCB.init();
   var margin = {top: 10, right: 50, bottom: 20, left: 50},
-      width = 120 - margin.left - margin.right,
+      width = 115 - margin.left - margin.right,
       height = $(".boxplot").height() - margin.top - margin.bottom;
 
   var min = -3,
@@ -16,7 +16,7 @@ $(document).ready(function() {
   chart.domain([min, max]);
   var data = [];
   for (var i = 0; i < LinUCB.k_arms; i++) {
-    data.push([]);
+    data.push([i]);
   }
 
   var svg = d3.select(".boxplot").selectAll("svg")
@@ -24,15 +24,37 @@ $(document).ready(function() {
     .enter().append("svg")
       .attr("class", "box")
       .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.bottom + margin.top)
-    .append("g")
+      .attr("height", height + margin.bottom + margin.top);
+    svg.append("text")
+      .attr("x", 2)
+      .attr("y", margin.top + 3)
+      .text(function(d) {
+        return d[0];
+      });
+    svg.append("text")
+      .attr("class", "box-chosen-count")
+      .attr("x", 2)
+      .attr("y", 2 * margin.top + 3)
+      .text(0);
+    svg.append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
       .call(chart);
-
-  setInterval(function() {
-    svg.call(chart.duration(1000));
+window.duration = 1000;
+$('.boxplot').click(function() {
+  var interval = setTimeout(function timeout() {
+    svg.call(chart.duration(duration));
     var iter = LinUCB.iter();
-  }, 1000);
+    var $count = $($(".box-chosen-count")[iter.chosen]);
+    $count.text(parseInt($count.text()) + 1);
+    if (LinUCB.regret.length >= 1000) {
+      console.log(LinUCB.regret.join('\n'));
+      debugger;
+    }
+    else {
+      setTimeout(timeout, duration);
+    }
+  }, duration);
+});
 /////////////////
 
   function randomize(d) {

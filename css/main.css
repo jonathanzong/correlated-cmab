@@ -42,7 +42,6 @@ svg {
 }
 
 .correlation .node circle {
-  fill: #333;
   cursor: pointer;
 }
 
@@ -61,6 +60,10 @@ svg {
 }
 
 .boxplot .box {
+  border: 1px solid #eee;
+}
+
+.boxplot .box g, .box-chosen-count {
   font: 10px sans-serif;
 }
 
@@ -82,5 +85,5 @@ svg {
 }
 
 .regret {
-  height: 100vh;
+  height: 50vh;
 }

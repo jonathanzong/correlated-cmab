@@ -2,12 +2,14 @@ $(document).ready(function() {
   var width = $(".correlation").width(),
     height = $(".correlation").height();
 
-  var fill = d3.scale.category20();
-
   var initializeNodes = [];
   for (var i = 0; i < LinUCB.k_arms; i++) {
     initializeNodes.push({index: i});
   }
+
+  var color = d3.scale.linear().domain([0, LinUCB.k_arms])
+      .interpolate(d3.interpolateHcl)
+      .range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]);
 
   var force = d3.layout.force()
       .size([width, height])
@@ -125,6 +127,7 @@ $(document).ready(function() {
       .attr("class", "node");
     g.append('circle')
       .attr("r", 15)
+      .attr("fill", function(d) {return color(d.index);})
       .on('mousedown', function(d) {
         mousedown_node = d;
 
@@ -167,8 +170,8 @@ $(document).ready(function() {
     for (var i = 0; i < links.length; i++) {
       var a = links[i].source.index;
       var b = links[i].target.index;
-      LinUCB.arms[a].setSharedContextAt(b, 1);
-      LinUCB.arms[b].setSharedContextAt(a, 1);
+      LinUCB.arms[a].setSharedContextAt(b, 0.5);
+      LinUCB.arms[b].setSharedContextAt(a, 0.5);
     }
   }
 

@@ -10,6 +10,17 @@ var Arm = function (id) {
   this.setSharedContextAt(id, 1) // arm is perfectly correlated with itself
   var distribution = LinUCB.reward_mapping(id);
   this.reward_distribution = gaussian(distribution.mean, distribution.variance);
+  this.rewardAtTime = [];
+  var cachedReward = localStorage.getItem('rewardAtTime'+id);
+  if (cachedReward) {
+    this.rewardAtTime = JSON.parse(cachedReward);
+  }
+  else {
+    for (var t = 0; t < 5001; t++) {
+      this.rewardAtTime[t] = this.reward_distribution.ppf(Math.random());
+    }
+    localStorage.setItem('rewardAtTime'+id, JSON.stringify(this.rewardAtTime));
+  }
 };
 
 Arm.prototype.setSharedContextAt = function(idx, val) {
@@ -51,7 +62,7 @@ Arm.prototype._prediction_variance = function() {
   return LinUCB.alpha * Math.sqrt(this.s());
 }
 
-Arm.prototype.reward = function() {
+Arm.prototype.reward = function(t) {
   // returns a sample from gaussian reward distribution
-  return this.reward_distribution.ppf(Math.random());
+  return this.rewardAtTime[t];
 };
